@@ -112,7 +112,7 @@ function dataExtracter(html) {
                        );
 
              // console.log(playername);
-              playerprocess(teamname, playername,opponentTeamName, Runs, Balls, four, six, strike);
+              Playerfn(teamname, playername,opponentTeamName, Runs, Balls, four, six, strike);
             }
            
         }
@@ -122,11 +122,14 @@ function dataExtracter(html) {
     }
  
 }
-function playerprocess(teamname, playername, opponentTeamName,Runs, Balls, four, six, strike) {
-  let dirname = process.cwd();
-  let folderpath = path.join(dirname, "ipl", teamname);
-  dircreator(folderpath);
-  let filepath = path.join(folderpath, playername + ".json");
+function Playerfn(teamname, playername, opponentTeamName,Runs, Balls, four, six, strike) {
+ let dirname = process.cwd();
+  let folderpath = path.join(dirname);
+  //dircreator(eventpath);
+
+  let teamfolder = path.join(folderpath,teamname);
+  dircreator(teamfolder);
+  let filepath = path.join(teamfolder, playername + ".json");
   //let content = jsoncreator(filepath, playername);
   let content = [];
   let matchobj = {
@@ -147,13 +150,13 @@ function playerprocess(teamname, playername, opponentTeamName,Runs, Balls, four,
   content.push(matchobj);
   fs.writeFileSync(filepath, JSON.stringify(content));
 }
-function dircreator(folderpath) {
-  if (fs.existsSync(folderpath) == false) {
-    fs.mkdirSync(folderpath);
-  }
+function dircreator(teamfolder) {
+  if (fs.existsSync(teamfolder) == false) {
+    fs.mkdirSync(teamfolder);
+  } 
 }
 
 module.exports={
     Scorecardfn
 }
-Scorecardfn(url);
+//Scorecardfn(url);
