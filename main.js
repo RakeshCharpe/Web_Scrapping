@@ -1,9 +1,12 @@
 let fs = require("fs");
+let path = require("path");
 let cheerio = require("cheerio");
 let request = require("request");
 let ScorecardObj=require("./Scorecard")
 
-let url="https://www.espncricinfo.com/series/ipl-2020-21-1210595";
+let url = "https://www.espncricinfo.com/series/ipl-2020-21-1210595";
+let iplpath = path.join(__dirname, "ipl");
+dircreator(iplpath);
 request(url, cb);
 function cb(error, response, html) {
   if (error) {
@@ -41,9 +44,14 @@ function getallscorecard(html) {
     for (let i = 0; i < chooseelement.length; i++) {
         let scorelink = searchTool(chooseelement[i]).attr("href");
         let AllMatchScorelink = `https://www.espncricinfo.com${scorelink}`;
-       // console.log(AllMatchScorelink);
+        console.log(AllMatchScorelink);
         ScorecardObj.Scorecardfn(AllMatchScorelink);
     }
     
      //request(fullAllMatchLink, newcb);
+}
+function dircreator(filepath) {
+  if (fs, fs.existsSync(filepath) == false) {
+    fs.mkdirSync(filepath);
+  }
 }

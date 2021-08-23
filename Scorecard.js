@@ -2,8 +2,9 @@ let fs = require("fs");
 let cheerio = require("cheerio");
 let request = require("request");
 let path = require("path");
+let xlsx = require("xlsx");
 
-let url = "https://www.espncricinfo.com/series/ipl-2020-21-1210595/delhi-capitals-vs-mumbai-indians-final-1237181/full-scorecard";
+//let url = "https://www.espncricinfo.com/series/ipl-2020-21-1210595/delhi-capitals-vs-mumbai-indians-final-1237181/full-scorecard";
 function Scorecardfn(url) {
     request(url, cb);
 }
@@ -123,16 +124,18 @@ function dataExtracter(html) {
  
 }
 function Playerfn(teamname, playername, opponentTeamName,Runs, Balls, four, six, strike) {
- let dirname = process.cwd();
-  let folderpath = path.join(dirname);
-  //dircreator(eventpath);
+  let teampath = path.join(__dirname, "ipl", teamname);
+  //let dirname = process.cwd();
+  //let folderpath = path.join(dirname);
+    dircreator(teampath);
 
-  let teamfolder = path.join(folderpath,teamname);
-  dircreator(teamfolder);
-  let filepath = path.join(teamfolder, playername + ".json");
+  //let teamfolder = path.join(folderpath,teamname);
+  //dircreator(teamfolder);
+  let filepath = path.join(teampath, playername + ".xlsx");
+  let content=excelReader(filepath,playername);
   //let content = jsoncreator(filepath, playername);
-  let content = [];
-  let matchobj = {
+  //let content = [];
+  let playerobj = {
     teamname,
     playername,
     opponentTeamName,
@@ -142,18 +145,35 @@ function Playerfn(teamname, playername, opponentTeamName,Runs, Balls, four, six,
     six,
     strike,
   };
-  content.push(matchobj);
-  if (fs.existsSync(filepath)) {
-    let buffer = fs.readFileSync(filepath);
-    content = JSON.parse(buffer);
-  }
-  content.push(matchobj);
-  fs.writeFileSync(filepath, JSON.stringify(content));
+  content.push(playerobj);
+  excelcreator(filepath, content, playername);
+  // if (fs.existsSync(filepath)) {
+  //   let buffer = fs.readFileSync(filepath);
+  //   content = JSON.parse(buffer);
+  // }
+  // content.push(matchobj);
+  // fs.writeFileSync(filepath, JSON.stringify(content));
 }
 function dircreator(teamfolder) {
   if (fs.existsSync(teamfolder) == false) {
     fs.mkdirSync(teamfolder);
   } 
+}
+
+function excelcreator(filepath, json, sheetname) {
+  let newWB = xlsx.utils.book_new();
+  let newWS = xlsx.utils.json_to_sheet(json);
+  xlsx.utils.book_append_sheet(newWB, newWS, sheetname);
+  xlsx.writeFile(newWB, filepath);
+}
+function excelReader(filepath, sheetname) {
+  if (fs.existsSync(filepath) == false) {
+    return [];
+  }
+  let wb = xlsx.readFile(filepath);
+  let exceldata = wb.Sheets[sheetname];
+  let ans = xlsx.utils.sheet_to_json(exceldata);
+  return ans;
 }
 
 module.exports={
